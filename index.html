@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPF Retirement Planner - Rev 1.06</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep:#0B2545;
+    --navy-mid:#13315C;
+    --navy-soft:#1E4066;
+    --gold:#C89B3C;
+    --gold-light:#E4C468;
+    --emerald:#2E7D5B;
+    --emerald-light:#8FC9AC;
+    --coral:#B5473F;
+    --red-dark:#7A2020;
+    --cream:#FAF8F4;
+    --panel:#F2EFE7;
+    --ink:#1C2530;
+    --ink-soft:#4A5568;
+    --line:#DCD5C4;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(160deg,var(--navy-deep) 0%,var(--navy-mid) 55%,var(--navy-soft) 100%);
+    color:#EFEAE0;
+    padding:56px 0 0;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-120px; top:-120px;
+    width:420px; height:420px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(200,155,60,0.16) 0%, transparent 70%);
+  }
+  .hero-top{
+    display:flex; justify-content:space-between; align-items:baseline; gap:24px;
+    flex-wrap:wrap;
+    position:relative; z-index:1;
+  }
+  .brand{
+    font-size:1.05rem; letter-spacing:0.02em; color:var(--gold-light);
+    font-weight:600;
+  }
+  .rev-badge{
+    font-size:0.8rem;
+    font-weight:600;
+    color:var(--gold-light);
+    border:1px solid rgba(228,196,104,0.5);
+    border-radius:999px;
+    padding:3px 12px;
+  }
+  .hero h1{
+    font-size:2.5rem;
+    font-weight:600;
+    max-width:660px;
+    margin:22px 0 10px;
+    line-height:1.15;
+    position:relative; z-index:1;
+  }
+  .hero p.sub{
+    max-width:580px;
+    color:#C7CEDA;
+    font-size:1.02rem;
+    margin:0 0 36px;
+    position:relative; z-index:1;
+  }
+
+  .result-cards{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:rgba(255,255,255,0.12);
+    border-radius:10px;
+    overflow:hidden;
+    position:relative; z-index:1;
+    transform:translateY(28px);
+    box-shadow:0 24px 48px -18px rgba(0,0,0,0.45);
+  }
+  .result-card{
+    background:var(--navy-deep);
+    padding:22px 18px 20px;
+  }
+  .result-card:nth-child(even){background:#0E2C4E;}
+  .result-card .label{
+    font-size:0.76rem; color:#9FADC2; margin-bottom:8px;
+  }
+  .result-card .value{
+    font-family:'Fraunces',Georgia,serif;
+    font-size:1.55rem;
+    font-weight:600;
+    color:var(--gold-light);
+  }
+  .result-card .note{
+    font-size:0.75rem; color:#9FADC2; margin-top:6px;
+  }
+  .result-card.warn .value{color:#E8968F;}
+  .result-card.good .value{color:var(--emerald-light);}
+
+  @media (max-width:1000px){
+    .result-cards{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:520px){
+    .result-cards{grid-template-columns:1fr;}
+  }
+
+  /* ---------- MAIN GRID ---------- */
+  .content{padding:84px 0 40px;}
+  .grid{
+    display:grid;
+    grid-template-columns:0.85fr 1.15fr;
+    gap:36px;
+    margin-top:20px;
+  }
+  @media (max-width:880px){
+    .grid{grid-template-columns:1fr;}
+    .hero h1{font-size:1.9rem;}
+    .result-cards{transform:translateY(20px);}
+  }
+
+  .section-title{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    margin:0 0 4px;
+  }
+  .section-heading{
+    font-size:1.3rem;
+    font-weight:600;
+    margin:0 0 18px;
+  }
+
+  /* input panel */
+  .panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:26px 26px 8px;
+  }
+  .field{margin-bottom:20px;}
+  .field label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:0.92rem; font-weight:600; margin-bottom:8px; color:var(--navy-deep);
+  }
+  .field label .unit{font-weight:500; color:var(--ink-soft); font-size:0.85rem;}
+  .field input[type="number"], .topup-row input[type="number"]{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:9px 12px;
+    font-size:0.98rem;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+  }
+  .field input[type="number"]:focus, .topup-row input[type="number"]:focus{
+    outline:2px solid var(--gold);
+    outline-offset:1px;
+    border-color:var(--gold);
+  }
+  .field input[type="range"]{
+    width:100%;
+    margin-top:10px;
+    accent-color:var(--navy-mid);
+  }
+  .field.optional{
+    border-top:1px dashed var(--line);
+    padding-top:18px;
+    margin-top:4px;
+  }
+  .field .helper{
+    font-size:0.78rem; color:var(--ink-soft); margin-top:6px;
+  }
+  .field .extra-start{
+    margin-top:12px;
+  }
+  .field .extra-start .mini-label{
+    font-size:0.82rem; font-weight:600; color:var(--navy-deep); margin-bottom:6px;
+  }
+  .inline-warn{
+    font-size:0.78rem;
+    color:var(--coral);
+    margin-top:6px;
+  }
+
+  /* voluntary top-ups */
+  .topup-block{
+    border-top:1px dashed var(--line);
+    padding-top:18px;
+    margin-top:4px;
+    margin-bottom:20px;
+  }
+  .topup-block .block-title{
+    font-size:0.92rem; font-weight:600; color:var(--navy-deep); margin-bottom:4px;
+  }
+  .topup-block .helper{
+    font-size:0.78rem; color:var(--ink-soft); margin-bottom:12px;
+  }
+  .topup-row{
+    display:grid;
+    grid-template-columns:62px 1fr 0.8fr;
+    gap:10px;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .topup-row .tag{
+    font-size:0.8rem; font-weight:600; color:var(--ink-soft);
+  }
+  .topup-head{
+    display:grid;
+    grid-template-columns:62px 1fr 0.8fr;
+    gap:10px;
+    font-size:0.74rem;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .topup-warn{
+    font-size:0.78rem;
+    color:var(--coral);
+    margin-top:4px;
+  }
+
+  .toggle-group{
+    display:inline-flex;
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+    margin-bottom:8px;
+  }
+  .toggle-btn{
+    border:none;
+    background:var(--cream);
+    color:var(--ink-soft);
+    font-family:'Inter',sans-serif;
+    font-size:0.82rem;
+    font-weight:600;
+    padding:6px 14px;
+    cursor:pointer;
+  }
+  .toggle-btn.active{
+    background:var(--navy-deep);
+    color:#fff;
+  }
+
+  /* assumptions strip */
+  .assumptions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:26px;
+  }
+  @media (max-width:600px){
+    .assumptions{grid-template-columns:1fr;}
+  }
+  .assume-card{
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:8px;
+    padding:16px 18px;
+  }
+  .assume-card .a-label{
+    font-size:0.78rem; color:var(--ink-soft); margin-bottom:4px;
+  }
+  .assume-card .a-value{
+    font-family:'Fraunces',Georgia,serif;
+    font-size:1.35rem; font-weight:600; color:var(--navy-deep);
+  }
+  .assume-card .a-note{font-size:0.78rem; color:var(--ink-soft); margin-top:4px;}
+
+  /* chart panel */
+  .chart-panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:24px 24px 10px;
+    margin-bottom:26px;
+  }
+  .chart-note{font-size:0.78rem; color:var(--ink-soft); margin:-4px 0 10px;}
+  .legend{display:flex; gap:16px; margin-bottom:6px; flex-wrap:wrap;}
+  .legend span{font-size:0.8rem; color:var(--ink-soft); display:flex; align-items:center; gap:7px;}
+  .legend .dot{width:12px; height:12px; border-radius:3px; display:inline-block;}
+  .legend .dot.round{border-radius:50%;}
+
+  /* doubling milestones table */
+  .milestones-panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow-x:auto;
+    margin-bottom:26px;
+  }
+  .milestones-empty{
+    color:var(--ink-soft); font-size:0.9rem; padding:18px 20px;
+  }
+
+  /* table */
+  .table-panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    margin-top:8px;
+  }
+  .table-scroll{max-height:460px; overflow:auto;}
+  table{width:100%; border-collapse:collapse; font-size:0.86rem;}
+  thead th{
+    position:sticky; top:0;
+    background:var(--navy-deep);
+    color:#EFEAE0;
+    text-align:right;
+    padding:11px 12px;
+    font-weight:600;
+    font-size:0.78rem;
+    white-space:nowrap;
+  }
+  tbody td{white-space:nowrap;}
+  thead th:first-child, thead th:nth-child(2), tbody td:first-child, tbody td:nth-child(2){text-align:left;}
+  tbody td{padding:9px 12px; text-align:right; border-bottom:1px solid var(--line); color:var(--ink);}
+  tbody tr:nth-child(even){background:var(--panel);}
+  tbody tr.retire-start{background:#D9E4EE;}
+  tbody tr.retire-start td{font-weight:700; color:var(--navy-deep);}
+  tbody tr.depleted{background:#F3D6D3;}
+  tbody tr.depleted td{font-weight:700; color:var(--red-dark);}
+  tbody tr.doubled td{color:var(--emerald); font-weight:600;}
+  .dividend-cell{color:var(--emerald);}
+  .topup-cell{color:var(--gold); font-weight:600;}
+  .extra-cell{color:var(--coral); font-weight:600;}
+
+  /* reference sections: dividend history + explainer */
+  .ref-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:26px; margin-bottom:26px; align-items:start;}
+  @media (max-width:880px){ .ref-grid{grid-template-columns:1fr;} }
+  .div-table-panel{background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+  .div-table thead th, .div-table tbody td{text-align:right;}
+  .div-table thead th:first-child, .div-table tbody td:first-child{text-align:left;}
+  .div-table thead th:nth-child(2), .div-table tbody td:nth-child(2){text-align:right;}
+  .div-table tbody td{padding:10px 14px;}
+  .bar-wrap{display:flex; align-items:center; justify-content:flex-end; gap:10px;}
+  .bar{height:8px; border-radius:4px; background:var(--navy-mid); opacity:0.85;}
+  .bar.shariah{background:var(--emerald);}
+  .na{color:var(--ink-soft); font-style:italic;}
+  .avg-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;}
+  @media (max-width:520px){ .avg-grid{grid-template-columns:1fr;} }
+  .div-compare{
+    font-size:0.88rem; color:var(--navy-deep); background:#FFF6DC; border:1px solid #EAD9A0;
+    border-radius:8px; padding:12px 14px; margin-bottom:12px;
+  }
+  .src-note{font-size:0.78rem; color:var(--ink-soft);}
+  .src-note a{color:var(--navy-mid);}
+
+  .bench-key{display:flex; flex-direction:column; gap:6px; margin:6px 0 12px; padding-top:10px; border-top:1px solid var(--line);}
+  .bench-key div{font-size:0.8rem; color:var(--ink); display:flex; align-items:center; gap:10px;}
+  .bench-key i{display:inline-block; width:26px; height:4px; border-radius:2px; flex:0 0 auto;}
+  .bench-note{font-size:0.74rem; color:var(--ink-soft); margin-top:2px;}
+
+  .explain{background:#fff; border:1px solid var(--line); border-radius:8px; padding:26px 28px; margin-bottom:26px;}
+  .explain h4{font-family:'Fraunces',Georgia,serif; font-size:1.05rem; margin:0 0 8px; color:var(--navy-deep);}
+  .explain p, .explain li{font-size:0.9rem; color:var(--ink); margin:0 0 10px;}
+  .explain ul{margin:0 0 6px; padding-left:20px;}
+  .eq-box{
+    background:var(--navy-deep); color:#EFEAE0; border-radius:8px; padding:16px 20px; margin-bottom:22px;
+    font-size:1rem;
+  }
+  .eq-box strong{color:var(--gold-light);}
+  .explain-grid{display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-bottom:8px;}
+  @media (max-width:880px){ .explain-grid{grid-template-columns:1fr;} }
+  .mini-table{width:100%; border-collapse:collapse; font-size:0.84rem; margin:8px 0 4px;}
+  .mini-table th{background:var(--panel); color:var(--ink); text-align:right; padding:8px 10px; position:static; font-size:0.78rem;}
+  .mini-table td{padding:8px 10px; text-align:right; border-bottom:1px solid var(--line);}
+  .mini-table th:first-child, .mini-table td:first-child{text-align:left;}
+  .mini-table tr.hl td{background:#EFE2C0; font-weight:700;}
+  .limits{border-top:1px dashed var(--line); padding-top:18px; margin-top:10px;}
+
+  footer{
+    padding:30px 0 60px;
+    color:var(--ink-soft);
+    font-size:0.82rem;
+    border-top:1px solid var(--line);
+    margin-top:20px;
+  }
+  footer .wrap{padding-top:26px;}
+  footer .rev{margin-top:10px; font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div class="brand">EPF Retirement Planner</div>
+      <div class="rev-badge">Rev 1.06</div>
+    </div>
+    <h1>See how long your EPF savings can carry you through retirement.</h1>
+    <p class="sub">Adjust your numbers below — including company contributions, voluntary top-ups, a planned retirement year or age, and extra retirement spending that starts when you choose — and watch the projection update instantly.</p>
+
+    <div class="result-cards">
+      <div class="result-card" id="cardAge">
+        <div class="label" id="lblCardAgeLabel">You can retire at age</div>
+        <div class="value" id="outAge">—</div>
+        <div class="note" id="outAgeNote">Calculating…</div>
+      </div>
+      <div class="result-card" id="cardAtRetirement">
+        <div class="label">EPF balance at retirement</div>
+        <div class="value" id="outAtRetirement">—</div>
+        <div class="note" id="outAtRetirementNote">vs Rule of 25 target</div>
+      </div>
+      <div class="result-card" id="cardAt100">
+        <div class="label">EPF balance at age 100</div>
+        <div class="value" id="outAt100">—</div>
+        <div class="note" id="outAt100Note">—</div>
+      </div>
+      <div class="result-card" id="cardThird">
+        <div class="label" id="lblCardThirdLabel">Years to reach that target</div>
+        <div class="value" id="outThird">—</div>
+        <div class="note" id="outThirdNote">From your current age</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="wrap" style="padding-top:56px;">
+
+    <div class="grid">
+
+      <!-- LEFT: INPUTS -->
+      <div>
+        <div class="section-title">Your numbers</div>
+        <div class="section-heading">Tell us where you stand today</div>
+
+        <div class="panel">
+          <div class="field">
+            <label>Current age <span class="unit" id="lblAge">30</span></label>
+            <input type="number" id="currentAge" value="30" min="18" max="70">
+            <input type="range" id="currentAgeR" value="30" min="18" max="70">
+          </div>
+
+          <div class="field">
+            <label>Current EPF balance <span class="unit" id="lblEpf">RM 50,000</span></label>
+            <input type="number" id="epfBalance" value="50000" min="0" step="1000">
+            <input type="range" id="epfBalanceR" value="50000" min="0" max="500000" step="1000">
+          </div>
+
+          <div class="field">
+            <label>Current monthly basic pay <span class="unit" id="lblPay">RM 6,000</span></label>
+            <input type="number" id="monthlyPay" value="6000" min="0" step="100">
+            <input type="range" id="monthlyPayR" value="6000" min="1500" max="30000" step="100">
+          </div>
+
+          <div class="field">
+            <label>Assumed yearly pay raise <span class="unit" id="lblRaise">4.0%</span></label>
+            <input type="number" id="payRaise" value="4" min="0" max="15" step="0.1">
+            <input type="range" id="payRaiseR" value="4" min="0" max="15" step="0.1">
+          </div>
+
+          <div class="field">
+            <label>Assumed EPF dividend, yearly <span class="unit" id="lblDiv">6.5%</span></label>
+            <input type="number" id="dividendRate" value="6.5" min="1" max="12" step="0.1">
+            <input type="range" id="dividendRateR" value="6.5" min="1" max="12" step="0.1">
+          </div>
+
+          <div class="field">
+            <label>Desired retirement spending / month <span class="unit" id="lblSpend">RM 4,000</span></label>
+            <input type="number" id="desiredSpend" value="4000" min="500" step="100">
+            <input type="range" id="desiredSpendR" value="4000" min="500" max="20000" step="100">
+            <div class="helper">Your baseline retirement withdrawal — also used for the Rule of 25 target</div>
+          </div>
+
+          <div class="field">
+            <label>Extra spending / month <span class="unit" id="lblExtra">RM 0</span></label>
+            <input type="number" id="extraSpend" value="0" min="0" step="100">
+            <input type="range" id="extraSpendR" value="0" min="0" max="10000" step="100">
+            <div class="extra-start">
+              <div class="mini-label">Extra spending starts in year</div>
+              <input type="number" id="extraStartYear" placeholder="Blank = not counted" step="1">
+            </div>
+            <div class="helper">Part of your retirement spending: from the start year onward, your monthly withdrawal becomes desired spending + extra spending, until age 100. Leave the year blank and the extra is not counted.</div>
+            <div class="inline-warn" id="extraWarn"></div>
+          </div>
+
+          <div class="field">
+            <label>Company extra retirement contribution <span class="unit" id="lblCompany">0.0%</span></label>
+            <input type="number" id="companyExtra" value="0" min="0" max="15" step="0.5">
+            <input type="range" id="companyExtraR" value="0" min="0" max="15" step="0.5">
+            <div class="helper">On top of the 23% statutory EPF rate, for companies that contribute more</div>
+          </div>
+
+          <div class="topup-block">
+            <div class="block-title">Voluntary top-ups <span style="font-weight:500; color:var(--ink-soft); font-size:0.85rem;">optional</span></div>
+            <div class="helper">Up to 5 top-ups, max RM 100,000 each. Each is made in January of the year you enter, so it earns that full year's dividend.</div>
+            <div class="topup-head"><span></span><span>Amount (RM)</span><span>Year</span></div>
+            <div id="topupRows"></div>
+            <div class="topup-warn" id="topupWarn"></div>
+          </div>
+
+          <div class="field optional">
+            <label>Planned retirement <span class="unit">optional</span></label>
+            <div class="toggle-group">
+              <button type="button" class="toggle-btn active" id="modeYearBtn">Year</button>
+              <button type="button" class="toggle-btn" id="modeAgeBtn">Age</button>
+            </div>
+            <input type="number" id="plannedValue" placeholder="e.g. 2055" step="1">
+            <div class="helper">Leave blank to let the calculator work out your retirement age automatically. If set, contributions stop and withdrawals begin from that point.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: ASSUMPTIONS + CHART -->
+      <div>
+        <div class="section-title">Fixed assumptions</div>
+        <div class="section-heading">What's baked into every projection</div>
+
+        <div class="assumptions">
+          <div class="assume-card">
+            <div class="a-label">EPF contribution rate</div>
+            <div class="a-value">23%</div>
+            <div class="a-note">Statutory, employee + employer, plus any company extra you enter</div>
+          </div>
+          <div class="assume-card">
+            <div class="a-label">Retirement target (Rule of 25)</div>
+            <div class="a-value">25x</div>
+            <div class="a-note">EPF needed = desired monthly spending x 12 x 25</div>
+          </div>
+        </div>
+
+        <div class="section-title">Projection</div>
+        <div class="section-heading">Balance versus your target</div>
+
+        <div class="chart-panel">
+          <div class="legend">
+            <span><i class="dot" style="background:#13315C"></i> Your EPF balance</span>
+            <span><i class="dot" style="background:#6B4FA0"></i> Rule of 25 target (dashed)</span>
+            <span><i class="dot round" style="background:#8FC9AC"></i> Doubling milestone</span>
+            <span><i class="dot round" style="background:#B5473F"></i> Retirement starts</span>
+            <span><i class="dot round" style="background:#7A2020"></i> Funds run out</span>
+          </div>
+          <div class="chart-note" id="chartNote">Showing up to age —</div>
+          <svg id="chart" viewBox="0 0 640 340" style="width:100%; height:auto; display:block;"></svg>
+          <div class="bench-key">
+            <div><i style="background:#D64545"></i> Basic Savings: RM390,000 (Covers basic retirement needs)</div>
+            <div><i style="background:#F2B705"></i> Adequate Savings: RM650,000 (Enables a decent lifestyle)</div>
+            <div><i style="background:#2FA866"></i> Enhanced Savings: RM1,300,000 (For a comfortable retirement)</div>
+            <div class="bench-note">Red, yellow and green work like a traffic light: the closer your balance gets to green, the more comfortable the retirement.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIVIDEND HISTORY -->
+    <div class="section-title" style="margin-top:12px;">Reference</div>
+    <div class="section-heading">EPF dividend history, last 10 years</div>
+    <div class="ref-grid">
+      <div class="div-table-panel">
+        <table class="div-table">
+          <thead>
+            <tr><th>Year</th><th>Conventional savings</th><th>Shariah savings</th></tr>
+          </thead>
+          <tbody id="divBody"></tbody>
+        </table>
+      </div>
+      <div>
+        <div class="avg-grid">
+          <div class="assume-card"><div class="a-label">10-year average, Conventional</div><div class="a-value" id="avg10c">—</div><div class="a-note">2016 to 2025</div></div>
+          <div class="assume-card"><div class="a-label">10-year average, Shariah</div><div class="a-value" id="avg10s">—</div><div class="a-note">2017 to 2025 (9 years, Shariah began in 2017)</div></div>
+          <div class="assume-card"><div class="a-label">5-year average, Conventional</div><div class="a-value" id="avg5c">—</div><div class="a-note">2021 to 2025</div></div>
+          <div class="assume-card"><div class="a-label">5-year average, Shariah</div><div class="a-value" id="avg5s">—</div><div class="a-note">2021 to 2025</div></div>
+        </div>
+        <div class="div-compare" id="divCompare"></div>
+        <div class="src-note">Source: <a href="https://www.kwsp.gov.my/ms/lain-lain/sumber-maklumat/dividen" target="_blank" rel="noopener">KWSP dividend page</a> and KWSP's yearly dividend announcements, checked on 5 November 2026. The 2025 rate was declared on 28 February 2026. Conventional savings carry a government-guaranteed minimum of 2.5%. Past dividends do not guarantee future dividends.</div>
+      </div>
+    </div>
+
+    <!-- DOUBLING MILESTONES -->
+    <div class="section-title" style="margin-top:12px;">Compounding in action</div>
+    <div class="section-heading">Every time your balance doubles from today</div>
+    <div class="milestones-panel">
+      <table id="milestonesTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Doubling</th>
+            <th>Balance</th>
+            <th>Year</th>
+            <th>Age</th>
+            <th>Years from today</th>
+            <th>Duration since last checkpoint</th>
+            <th>Top-up that year</th>
+            <th>Top-ups to date</th>
+          </tr>
+        </thead>
+        <tbody id="milestonesBody"></tbody>
+      </table>
+      <div class="milestones-empty" id="milestonesEmpty"></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="section-title" style="margin-top:12px;">Year by year</div>
+    <div class="section-heading">The full path through accumulation and retirement</div>
+
+    <div class="table-panel">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Age</th>
+              <th>Monthly pay</th>
+              <th>Contribution / (withdrawal)</th>
+              <th>Of which extra spending</th>
+              <th>Voluntary top-up</th>
+              <th>Dividend received</th>
+              <th>EPF balance</th>
+              <th>Target (25x spend)</th>
+              <th>Gap</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- 4% / 25x EXPLAINER -->
+    <div class="section-title" style="margin-top:12px;">Good to know</div>
+    <div class="section-heading">The 4% rule and "25x": what they mean</div>
+    <div class="explain">
+      <div class="eq-box"><strong>25x your yearly spending</strong> and <strong>the 4% rule</strong> are the same rule written two ways, because 1 ÷ 4% = 25.</div>
+      <div class="explain-grid">
+        <div>
+          <h4>Are they the same?</h4>
+          <p>Yes, they are equivalent. The 4% rule says you can withdraw about 4% of your savings in your first year of retirement. Turn it around and ask "how big must my savings be?" and you get: yearly spending ÷ 0.04 = yearly spending × 25.</p>
+          <p>Example: you want RM 4,000 a month, which is RM 48,000 a year. RM 48,000 × 25 = RM 1,200,000. And 4% of RM 1,200,000 is RM 48,000. Same answer both ways.</p>
+          <table class="mini-table">
+            <thead><tr><th>Withdrawal rate</th><th>Multiple</th><th>Savings for RM 48,000 / year</th></tr></thead>
+            <tbody>
+              <tr><td>5%</td><td>20x</td><td>RM 960,000</td></tr>
+              <tr class="hl"><td>4%</td><td>25x</td><td>RM 1,200,000</td></tr>
+              <tr><td>3.5%</td><td>28.6x</td><td>RM 1,371,429</td></tr>
+              <tr><td>3%</td><td>33.3x</td><td>RM 1,600,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h4>Where it comes from</h4>
+          <p>The 4% figure comes from US research in the 1990s (William Bengen in 1994, then the "Trinity Study" in 1998). They tested mixes of shares and bonds against past market history. Withdrawing 4% in year one, then raising the amount each year with inflation, lasted 30 years in nearly all the periods they tested.</p>
+          <h4>Why this planner uses 25x</h4>
+          <ul>
+            <li>It is simple and widely known, and it gives one clear target number.</li>
+            <li>It does not depend on guessing future dividends. A 4% withdrawal is below EPF's 10-year average conventional dividend of <span id="expAvg">about 5.9%</span>, which leaves a cushion for inflation and weaker years.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="limits">
+        <h4>Honest limits</h4>
+        <ul>
+          <li>It was built for about 30-year retirements using US data. If you retire early and need money for 40 years or more, many planners use 3% to 3.5% instead (about 29x to 33x).</li>
+          <li>EPF is not a plain stock-and-bond mix. The dividend is declared once a year and is only guaranteed at 2.5% for conventional savings.</li>
+          <li>The real 4% rule raises your withdrawals with inflation every year. This planner keeps your spending and the target in today's ringgit, so its results look kinder than real life. Treat them as a guide, not a promise.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    This tool provides an illustrative projection only, based on the assumptions you enter and the fixed rates shown above, in today's ringgit (no inflation adjustment applied to spending or the target). If you set a planned retirement year or age, contributions are assumed to stop entirely from that point and your monthly spending is withdrawn from the EPF balance every year after, growing only by the dividend rate, until age 100 or until the balance reaches zero. The same applies automatically once your balance crosses the Rule of 25 target, even without a plan set. Extra spending is part of your retirement spending: from the start year you enter, the annual withdrawal equals (desired retirement spending + extra spending) x 12, until age 100. If no start year is entered, the extra spending is not counted. It only affects retirement years, so a start year before your retirement year takes effect at retirement. The Rule of 25 target always uses your desired retirement spending only. "EPF balance at retirement" is the balance you carry into your first retirement year, before that year's dividend and withdrawal. Voluntary top-ups are assumed to be paid in January of the year entered, added directly to that year's balance, and earn that full year's dividend; top-up years must fall after the current year. In every year, the contribution (working years) or withdrawal (retired years) and any voluntary top-up are applied to the balance first, and "Dividend received" is then calculated on that adjusted balance. The dividend history table is reference information only and does not change the projection; the dividend rate used in the projection is the one you enter. The red, yellow and green savings lines are fixed benchmarks of RM390,000, RM650,000 and RM1,300,000. It does not account for EPF withdrawals (housing, medical, Age 50/55 rules), tax, market volatility, or changes to EPF policy, and is not financial advice.
+    <div class="rev">EPF Retirement Planner — Rev 1.06</div>
+  </div>
+</footer>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const fmtRM = n => 'RM ' + Math.round(n).toLocaleString('en-MY');
+  const fmtRMk = n => {
+    if (n >= 1000000) return (n/1000000).toFixed(2) + 'M';
+    if (n >= 1000) return Math.round(n/1000) + 'K';
+    return Math.round(n).toString();
+  };
+
+  const slidableIds = ['currentAge','epfBalance','monthlyPay','payRaise','dividendRate','desiredSpend','extraSpend','companyExtra'];
+  slidableIds.forEach(id => {
+    const num = $(id), range = $(id+'R');
+    num.addEventListener('input', () => { range.value = num.value; compute(); });
+    range.addEventListener('input', () => { num.value = range.value; compute(); });
+  });
+  $('extraStartYear').addEventListener('input', compute);
+
+  // Build the 5 voluntary top-up rows
+  const TOPUP_COUNT = 5;
+  const TOPUP_MAX = 100000;
+  (function buildTopups(){
+    const host = $('topupRows');
+    for (let k = 0; k < TOPUP_COUNT; k++){
+      const row = document.createElement('div');
+      row.className = 'topup-row';
+      row.innerHTML = `
+        <span class="tag">Top-up ${k+1}</span>
+        <input type="number" id="topAmt${k}" min="0" max="${TOPUP_MAX}" step="1000" placeholder="0">
+        <input type="number" id="topYr${k}" step="1" placeholder="e.g. 2030">
+      `;
+      host.appendChild(row);
+      $('topAmt'+k).addEventListener('input', () => {
+        const el = $('topAmt'+k);
+        let v = parseFloat(el.value);
+        if (!isNaN(v)){
+          if (v > TOPUP_MAX) el.value = TOPUP_MAX;
+          if (v < 0) el.value = 0;
+        }
+        compute();
+      });
+      $('topYr'+k).addEventListener('input', compute);
+    }
+  })();
+
+  let plannedMode = 'year';
+  $('modeYearBtn').addEventListener('click', () => {
+    plannedMode = 'year';
+    $('modeYearBtn').classList.add('active');
+    $('modeAgeBtn').classList.remove('active');
+    $('plannedValue').placeholder = 'e.g. 2055';
+    compute();
+  });
+  $('modeAgeBtn').addEventListener('click', () => {
+    plannedMode = 'age';
+    $('modeAgeBtn').classList.add('active');
+    $('modeYearBtn').classList.remove('active');
+    $('plannedValue').placeholder = 'e.g. 55';
+    compute();
+  });
+  $('plannedValue').addEventListener('input', compute);
+
+  // EPF dividend history (percent per year). Source: KWSP dividend page and yearly KWSP announcements, checked 5 Nov 2026.
+  // Shariah savings began in 2017, so 2016 has no Shariah rate.
+  const DIV_DATA = [
+    {year:2025, conv:6.15, shar:6.15},
+    {year:2024, conv:6.30, shar:6.30},
+    {year:2023, conv:5.50, shar:5.40},
+    {year:2022, conv:5.35, shar:4.75},
+    {year:2021, conv:6.10, shar:5.65},
+    {year:2020, conv:5.20, shar:4.90},
+    {year:2019, conv:5.45, shar:5.00},
+    {year:2018, conv:6.15, shar:5.90},
+    {year:2017, conv:6.90, shar:6.40},
+    {year:2016, conv:5.70, shar:null}
+  ];
+
+  // Savings benchmarks drawn on the chart (traffic-light colours), lowest first
+  const BENCHMARKS = [
+    {value:390000,  color:'#D64545', text:'#D64545', short:'Basic'},
+    {value:650000,  color:'#F2B705', text:'#9A7400', short:'Adequate'},
+    {value:1300000, color:'#2FA866', text:'#1F7A49', short:'Enhanced'}
+  ];
+
+  const CONTRIB_RATE = 0.23;
+  const RULE_MULTIPLE = 25;
+  const MAX_AGE = 100;
+  const CHART_BUFFER_YEARS = 10;
+
+  function compute(){
+    const currentAge = parseFloat($('currentAge').value) || 0;
+    const epfStart = parseFloat($('epfBalance').value) || 0;
+    const payStart = parseFloat($('monthlyPay').value) || 0;
+    const raise = (parseFloat($('payRaise').value) || 0) / 100;
+    const dividend = (parseFloat($('dividendRate').value) || 0) / 100;
+    const desiredSpend = parseFloat($('desiredSpend').value) || 0;
+    const extraSpend = parseFloat($('extraSpend').value) || 0;
+    const extraStartRaw = $('extraStartYear').value;
+    const companyExtra = (parseFloat($('companyExtra').value) || 0) / 100;
+    const plannedRaw = $('plannedValue').value;
+    const nowYear = new Date().getFullYear();
+    const lastYear = nowYear + (MAX_AGE - currentAge);
+
+    $('lblAge').textContent = currentAge;
+    $('lblEpf').textContent = fmtRM(epfStart);
+    $('lblPay').textContent = fmtRM(payStart);
+    $('lblRaise').textContent = raise*100 === Math.round(raise*100) ? (raise*100).toFixed(1)+'%' : (raise*100)+'%';
+    $('lblDiv').textContent = (dividend*100).toFixed(1)+'%';
+    updateDividendCompare(dividend*100);
+    $('lblSpend').textContent = fmtRM(desiredSpend);
+    $('lblExtra').textContent = fmtRM(extraSpend);
+    $('lblCompany').textContent = (companyExtra*100).toFixed(1)+'%';
+
+    const totalContribRate = CONTRIB_RATE + companyExtra;
+    const requiredEpf = desiredSpend * 12 * RULE_MULTIPLE;
+
+    // Start year for the extra spending (null = no year entered, so the extra is not counted)
+    let extraStartYear = null;
+    const extraStartParsed = parseInt(extraStartRaw, 10);
+    if (extraStartRaw !== '' && !isNaN(extraStartParsed)) extraStartYear = extraStartParsed;
+
+    // Voluntary top-ups, summed per year (paid in January, so they earn that year's dividend)
+    const topupsByYear = {};
+    const warnings = [];
+    for (let k = 0; k < TOPUP_COUNT; k++){
+      let amt = parseFloat($('topAmt'+k).value);
+      const yr = parseInt($('topYr'+k).value, 10);
+      if (isNaN(amt) || amt <= 0) continue;
+      if (amt > TOPUP_MAX) amt = TOPUP_MAX;
+      if (isNaN(yr)){
+        warnings.push(`Top-up ${k+1}: enter a year to include it.`);
+      } else if (yr <= nowYear || yr > lastYear){
+        warnings.push(`Top-up ${k+1} ignored: year must be between ${nowYear+1} and ${lastYear}.`);
+      } else {
+        topupsByYear[yr] = (topupsByYear[yr] || 0) + amt;
+      }
+    }
+    $('topupWarn').innerHTML = warnings.join('<br>');
+
+    // Determine planned retirement age, from either a year or an age input
+    let plannedAge = null;
+    let plannedYearResolved = null;
+    if (plannedRaw !== ''){
+      const val = parseFloat(plannedRaw);
+      if (!isNaN(val)){
+        if (plannedMode === 'year'){
+          plannedAge = currentAge + (val - nowYear);
+        } else {
+          plannedAge = val;
+        }
+        if (plannedAge < currentAge) plannedAge = currentAge;
+        if (plannedAge > MAX_AGE){
+          plannedAge = null;
+        } else {
+          plannedYearResolved = nowYear + (plannedAge - currentAge);
+        }
+      }
+    }
+    const hasPlan = plannedAge !== null;
+
+    let balance = epfStart;
+    let pay = payStart;
+    let retired = false;
+    let retirementStartAge = null;
+    let retirementStartYear = null;
+    let depletionAge = null;
+    let cumTopUp = 0;
+    const rows = [];
+
+    for (let i = 0; i <= (MAX_AGE - currentAge); i++){
+      const age = currentAge + i;
+      const year = nowYear + i;
+      const topUp = i > 0 ? (topupsByYear[year] || 0) : 0;
+      cumTopUp += topUp;
+
+      if (!retired){
+        if (hasPlan){
+          if (age >= plannedAge){ retired = true; retirementStartAge = age; retirementStartYear = year; }
+        } else {
+          if (i > 0 && balance >= requiredEpf){ retired = true; retirementStartAge = age; retirementStartYear = year; }
+        }
+      }
+
+      if (!retired){
+        // Working year: contribution and top-up only, no spending withdrawal
+        const annualContribution = pay * 12 * totalContribRate;
+        const opening = balance;
+        let dividendAmount = 0;
+        if (i > 0){
+          const base = balance + annualContribution + topUp;
+          dividendAmount = base * dividend;
+          balance = base + dividendAmount;
+        }
+        rows.push({age, year, pay, opening, cashFlow: i>0?annualContribution:0, extraAnnual: 0, topUp, cumTopUp, dividendAmount, balance, requiredEpf, gap: balance-requiredEpf, phase:'accumulate'});
+        pay = pay * (1 + raise);
+      } else {
+        // Retired year: withdrawal = desired retirement spending + extra spending (only from the start year, if one was entered)
+        const extraActive = extraSpend > 0 && extraStartYear !== null && year >= extraStartYear;
+        const extraAnnual = extraActive ? extraSpend * 12 : 0;
+        const annualWithdrawal = desiredSpend * 12 + extraAnnual;
+        const opening = balance;
+        let base = balance + topUp - annualWithdrawal;
+        if (base < 0) base = 0;
+        const dividendAmount = base * dividend;
+        balance = base + dividendAmount;
+        rows.push({age, year, pay:null, opening, cashFlow: -annualWithdrawal, extraAnnual, topUp, cumTopUp, dividendAmount, balance, requiredEpf, gap: balance-requiredEpf, phase:'withdraw'});
+        if (balance <= 0 && depletionAge === null){
+          depletionAge = age;
+        }
+      }
+    }
+
+    // Explain how the extra-spending start year was interpreted
+    let extraNote = '';
+    if (extraSpend > 0){
+      if (extraStartYear === null){
+        extraNote = 'No start year entered, so the extra spending is not counted.';
+      } else if (extraStartYear > lastYear){
+        extraNote = `Start year is after you turn 100 (${lastYear}), so the extra spending never applies.`;
+      } else if (retirementStartYear === null){
+        extraNote = 'You do not reach retirement by age 100 with these numbers, so the extra spending does not apply.';
+      } else if (extraStartYear < retirementStartYear){
+        extraNote = `You retire in ${retirementStartYear}, so the extra spending is counted from then rather than from ${extraStartYear}.`;
+      }
+    }
+    $('extraWarn').textContent = extraNote;
+
+    const balanceAtRetirement = retirementStartAge !== null ? rows.find(r => r.age === retirementStartAge).opening : null;
+    const balanceAt100 = rows[rows.length - 1].balance;
+
+    // Hero card 1: retirement age
+    if (hasPlan){
+      $('lblCardAgeLabel').textContent = 'Your planned retirement age';
+      $('outAge').textContent = plannedAge;
+      $('outAgeNote').textContent = 'Year ' + plannedYearResolved;
+      $('cardAge').classList.remove('warn');
+    } else if (retirementStartAge !== null){
+      $('lblCardAgeLabel').textContent = 'You can retire at age';
+      $('outAge').textContent = retirementStartAge;
+      $('outAgeNote').textContent = 'Balance reaches 25x your desired spending';
+      $('cardAge').classList.remove('warn');
+    } else {
+      $('lblCardAgeLabel').textContent = 'You can retire at age';
+      $('outAge').textContent = '100+';
+      $('outAgeNote').textContent = 'Not reached by age 100 with these numbers';
+      $('cardAge').classList.add('warn');
+    }
+
+    // Hero card 2: EPF balance at retirement
+    if (balanceAtRetirement !== null){
+      $('outAtRetirement').textContent = fmtRM(balanceAtRetirement);
+      const diff = balanceAtRetirement - requiredEpf;
+      $('outAtRetirementNote').textContent = diff >= 0
+        ? `${fmtRM(diff)} above the ${fmtRM(requiredEpf)} target`
+        : `${fmtRM(Math.abs(diff))} short of the ${fmtRM(requiredEpf)} target`;
+    } else {
+      $('outAtRetirement').textContent = '—';
+      $('outAtRetirementNote').textContent = 'Retirement not reached by age 100';
+    }
+
+    // Hero card 3: EPF balance at age 100
+    $('outAt100').textContent = fmtRM(balanceAt100);
+    if (depletionAge !== null){
+      $('outAt100Note').textContent = 'Funds ran out at age ' + depletionAge;
+      $('cardAt100').classList.add('warn');
+      $('cardAt100').classList.remove('good');
+    } else if (retirementStartAge !== null) {
+      $('outAt100Note').textContent = 'Still available at age 100';
+      $('cardAt100').classList.add('good');
+      $('cardAt100').classList.remove('warn');
+    } else {
+      $('outAt100Note').textContent = 'Still working / accumulating';
+      $('cardAt100').classList.remove('good');
+      $('cardAt100').classList.remove('warn');
+    }
+
+    // Hero card 4: mode-dependent duration stat
+    if (hasPlan){
+      $('lblCardThirdLabel').textContent = 'Balance lasts in retirement';
+      if (depletionAge !== null){
+        $('outThird').textContent = (depletionAge - retirementStartAge) + ' yrs';
+        $('outThirdNote').textContent = 'Runs out at age ' + depletionAge;
+      } else {
+        $('outThird').textContent = (MAX_AGE - retirementStartAge) + '+ yrs';
+        $('outThirdNote').textContent = 'Lasts through age 100';
+      }
+    } else if (retirementStartAge !== null){
+      $('lblCardThirdLabel').textContent = 'Years to reach that target';
+      $('outThird').textContent = (retirementStartAge - currentAge) + ' yrs';
+      $('outThirdNote').textContent = depletionAge !== null
+        ? 'Balance then runs out at age ' + depletionAge
+        : 'Balance then lasts through age 100';
+    } else {
+      $('lblCardThirdLabel').textContent = 'Years to reach that target';
+      $('outThird').textContent = '—';
+      $('outThirdNote').textContent = 'From your current age';
+    }
+
+    // Every doubling milestone: 2x, 4x, 8x, 16x... of the starting balance
+    const milestones = [];
+    if (epfStart > 0){
+      let k = 1;
+      let target = epfStart * 2;
+      for (const r of rows){
+        while (r.balance >= target){
+          milestones.push({multiple: Math.pow(2,k), age: r.age, year: r.year, years: r.age - currentAge, balance: r.balance, topUp: r.topUp, cumTopUp: r.cumTopUp});
+          k++;
+          target = epfStart * Math.pow(2,k);
+        }
+      }
+    }
+
+    renderMilestones(milestones, epfStart, currentAge);
+    renderTable(rows, retirementStartAge, depletionAge, milestones);
+
+    // Chart range: mode A always shows the full run to age 100; mode B trims to retirement age + 10
+    let chartMaxAge;
+    if (hasPlan){
+      chartMaxAge = MAX_AGE;
+      $('chartNote').textContent = 'Showing up to age 100 (planned retirement at age ' + plannedAge + ')';
+    } else if (retirementStartAge !== null){
+      chartMaxAge = Math.min(retirementStartAge + CHART_BUFFER_YEARS, MAX_AGE);
+      $('chartNote').textContent = `Showing up to age ${chartMaxAge} (retirement age + ${CHART_BUFFER_YEARS} years)`;
+    } else {
+      chartMaxAge = MAX_AGE;
+      $('chartNote').textContent = `Showing up to age ${chartMaxAge}`;
+    }
+    const chartRows = rows.filter(r => r.age <= chartMaxAge);
+    renderChart(chartRows, retirementStartAge, depletionAge, milestones.filter(m => m.age <= chartMaxAge));
+  }
+
+  function renderMilestones(milestones, epfStart, currentAge){
+    const table = $('milestonesTable');
+    const body = $('milestonesBody');
+    const empty = $('milestonesEmpty');
+    body.innerHTML = '';
+
+    if (epfStart <= 0){
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      empty.textContent = 'Add a starting EPF balance to see doubling milestones.';
+      return;
+    }
+    if (milestones.length === 0){
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      empty.textContent = 'Balance does not double from its starting point by age 100 with these numbers.';
+      return;
+    }
+
+    table.style.display = 'table';
+    empty.style.display = 'none';
+
+    let prevAge = currentAge;
+    milestones.forEach(m => {
+      const duration = m.age - prevAge;
+      prevAge = m.age;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${m.multiple}x</td>
+        <td>${fmtRM(m.balance)}</td>
+        <td>${m.year}</td>
+        <td>${m.age}</td>
+        <td>${m.years} yrs</td>
+        <td>${duration} yrs</td>
+        <td class="${m.topUp > 0 ? 'topup-cell' : ''}">${m.topUp > 0 ? fmtRM(m.topUp) : '—'}</td>
+        <td>${m.cumTopUp > 0 ? fmtRM(m.cumTopUp) : '—'}</td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function renderTable(rows, retirementStartAge, depletionAge, milestones){
+    const body = $('tableBody');
+    body.innerHTML = '';
+    const milestoneByAge = {};
+    milestones.forEach(m => { milestoneByAge[m.age] = milestoneByAge[m.age] ? milestoneByAge[m.age] + ', ' + m.multiple + 'x' : m.multiple + 'x'; });
+
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const hasMilestone = milestoneByAge[r.age];
+
+      if (r.age === retirementStartAge) tr.className = 'retire-start';
+      else if (r.age === depletionAge) tr.className = 'depleted';
+      else if (hasMilestone) tr.className = 'doubled';
+
+      const cashLabel = r.cashFlow >= 0
+        ? (r.cashFlow === 0 ? '—' : fmtRM(r.cashFlow))
+        : ('(' + fmtRM(Math.abs(r.cashFlow)) + ')');
+      const extraLabel = r.extraAnnual > 0 ? fmtRM(r.extraAnnual) : '—';
+      const topUpLabel = r.topUp > 0 ? fmtRM(r.topUp) : '—';
+      const dividendLabel = r.dividendAmount > 0 ? fmtRM(r.dividendAmount) : '—';
+      const gapLabel = r.gap >= 0 ? ('+' + fmtRM(r.gap)) : ('−' + fmtRM(Math.abs(r.gap)));
+
+      let ageLabel = r.age;
+      if (r.age === retirementStartAge) ageLabel += ' — retirement starts';
+      if (r.age === depletionAge) ageLabel += ' — funds run out';
+      if (hasMilestone) ageLabel += ' — ' + hasMilestone;
+
+      tr.innerHTML = `
+        <td>${r.year}</td>
+        <td>${ageLabel}</td>
+        <td>${r.pay === null ? '—' : fmtRM(r.pay)}</td>
+        <td>${cashLabel}</td>
+        <td class="${r.extraAnnual > 0 ? 'extra-cell' : ''}">${extraLabel}</td>
+        <td class="${r.topUp > 0 ? 'topup-cell' : ''}">${topUpLabel}</td>
+        <td class="dividend-cell">${dividendLabel}</td>
+        <td>${fmtRM(r.balance)}</td>
+        <td>${fmtRM(r.requiredEpf)}</td>
+        <td>${gapLabel}</td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function renderChart(rows, retirementStartAge, depletionAge, milestones){
+    const svg = $('chart');
+    const W = 640, H = 340, padL = 74, padR = 16, padT = 16, padB = 50;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+
+    const maxVal = Math.max(BENCHMARKS[BENCHMARKS.length-1].value, ...rows.map(r => Math.max(r.balance, r.requiredEpf))) * 1.08;
+    const minAge = rows[0].age, maxAge = rows[rows.length-1].age;
+    const ageSpan = Math.max(maxAge - minAge, 1);
+
+    const x = age => padL + ((age - minAge) / ageSpan) * plotW;
+    const y = val => padT + plotH - (val / maxVal) * plotH;
+
+    let svgParts = [];
+
+    // gridlines + y ticks
+    const gridSteps = 4;
+    for (let g = 0; g <= gridSteps; g++){
+      const val = (maxVal/gridSteps)*g;
+      const yy = y(val);
+      svgParts.push(`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="#E3DDCB" stroke-width="1"/>`);
+      svgParts.push(`<text x="${padL-8}" y="${yy+4}" font-size="10" fill="#4A5568" text-anchor="end" font-family="Inter,sans-serif">${fmtRMk(val)}</text>`);
+    }
+
+    // x axis labels (every few years)
+    const ageStep = Math.ceil(ageSpan / 8) || 1;
+    for (let age = minAge; age <= maxAge; age += ageStep){
+      svgParts.push(`<text x="${x(age)}" y="${padT+plotH+18}" font-size="10" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">${age}</text>`);
+    }
+
+    // axis titles
+    svgParts.push(`<text x="${padL + plotW/2}" y="${H-6}" font-size="11.5" fill="#1C2530" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">Age</text>`);
+    svgParts.push(`<text x="16" y="${padT + plotH/2}" font-size="11.5" fill="#1C2530" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600" transform="rotate(-90 16 ${padT + plotH/2})">EPF balance (RM)</text>`);
+
+    // Savings benchmark lines (traffic light): red = basic, yellow = adequate, green = enhanced
+    BENCHMARKS.forEach(b => {
+      const by = y(b.value);
+      svgParts.push(`<line x1="${padL}" y1="${by}" x2="${W-padR}" y2="${by}" stroke="${b.color}" stroke-width="2"/>`);
+    });
+    let prevLabelY = Infinity;
+    BENCHMARKS.forEach(b => {
+      let ly = y(b.value) - 5;
+      if (prevLabelY - ly < 13) ly = prevLabelY - 13;
+      prevLabelY = ly;
+      svgParts.push(`<text x="${W-padR-4}" y="${ly}" font-size="10" fill="${b.text}" text-anchor="end" font-family="Inter,sans-serif" font-weight="700">${b.short} RM${fmtRMk(b.value)}</text>`);
+    });
+
+    const balPts = rows.map(r => `${x(r.age)},${y(r.balance)}`).join(' ');
+    const reqPts = rows.map(r => `${x(r.age)},${y(r.requiredEpf)}`).join(' ');
+
+    svgParts.push(`<polyline points="${balPts}" fill="none" stroke="#13315C" stroke-width="2.5"/>`);
+    svgParts.push(`<polyline points="${reqPts}" fill="none" stroke="#6B4FA0" stroke-width="2.5" stroke-dasharray="7,4"/>`);
+
+    if (retirementStartAge !== null){
+      const r = rows.find(r => r.age === retirementStartAge);
+      if (r){
+        svgParts.push(`<line x1="${x(r.age)}" y1="${padT}" x2="${x(r.age)}" y2="${padT+plotH}" stroke="#B5473F" stroke-width="1.2" stroke-dasharray="4,4"/>`);
+        svgParts.push(`<circle cx="${x(r.age)}" cy="${y(r.opening)}" r="5" fill="#B5473F"/>`);
+        svgParts.push(`<text x="${x(r.age)}" y="${padT+12}" font-size="11" fill="#B5473F" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">Retire ${r.age}</text>`);
+      }
+    }
+
+    if (depletionAge !== null){
+      const r = rows.find(r => r.age === depletionAge);
+      if (r){
+        svgParts.push(`<line x1="${x(r.age)}" y1="${padT}" x2="${x(r.age)}" y2="${padT+plotH}" stroke="#7A2020" stroke-width="1.2" stroke-dasharray="4,4"/>`);
+        svgParts.push(`<circle cx="${x(r.age)}" cy="${y(r.balance)}" r="5" fill="#7A2020"/>`);
+        svgParts.push(`<text x="${x(r.age)}" y="${y(r.balance)-12}" font-size="11" fill="#7A2020" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">Runs out ${r.age}</text>`);
+      }
+    }
+
+    milestones.forEach((m, idx) => {
+      const px = x(m.age), py = y(m.balance);
+      const above = idx % 2 === 0;
+      const ty = above ? py - 10 : py + 16;
+      svgParts.push(`<circle cx="${px}" cy="${py}" r="3.5" fill="#2E7D5B"/>`);
+      svgParts.push(`<text x="${px}" y="${ty}" font-size="9.5" fill="#2E7D5B" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">${m.multiple}x</text>`);
+    });
+
+    svg.innerHTML = svgParts.join('');
+  }
+
+  // ---------- Dividend history (reference only, does not affect the projection) ----------
+  function divAvg(key, years){
+    const vals = DIV_DATA.slice(0, years).map(d => d[key]).filter(v => v !== null);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  }
+  function renderDividendHistory(){
+    const body = $('divBody');
+    body.innerHTML = '';
+    const maxRate = 7;
+    DIV_DATA.forEach(d => {
+      const tr = document.createElement('tr');
+      const conv = `<div class="bar-wrap"><div class="bar" style="width:${(d.conv/maxRate)*90}px"></div><span>${d.conv.toFixed(2)}%</span></div>`;
+      const shar = d.shar === null
+        ? '<span class="na">not available</span>'
+        : `<div class="bar-wrap"><div class="bar shariah" style="width:${(d.shar/maxRate)*90}px"></div><span>${d.shar.toFixed(2)}%</span></div>`;
+      tr.innerHTML = `<td>${d.year}</td><td>${conv}</td><td>${shar}</td>`;
+      body.appendChild(tr);
+    });
+    $('avg10c').textContent = divAvg('conv', 10).toFixed(2) + '%';
+    $('avg10s').textContent = divAvg('shar', 10).toFixed(2) + '%';
+    $('avg5c').textContent = divAvg('conv', 5).toFixed(2) + '%';
+    $('avg5s').textContent = divAvg('shar', 5).toFixed(2) + '%';
+    $('expAvg').textContent = divAvg('conv', 10).toFixed(2) + '%';
+  }
+  function updateDividendCompare(pct){
+    const avg10 = divAvg('conv', 10);
+    const diff = pct - avg10;
+    const word = Math.abs(diff) < 0.005 ? 'equal to' : (diff > 0 ? Math.abs(diff).toFixed(2) + ' points above' : Math.abs(diff).toFixed(2) + ' points below');
+    $('divCompare').textContent = `The dividend you entered (${pct.toFixed(1)}%) is ${word} the 10-year conventional average of ${avg10.toFixed(2)}%.`;
+  }
+
+  renderDividendHistory();
+  compute();
+</script>
+
+</body>
+</html>
